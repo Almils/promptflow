@@ -1,13 +1,22 @@
 "use client";
+
 import { useEffect, useState } from "react";
 
+interface LeaderboardUser {
+  id: string;
+  name?: string | null;
+  image?: string | null;
+  points: number;
+}
+
 export default function LeaderboardPage() {
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<LeaderboardUser[]>([]);
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
       const res = await fetch("/api/leaderboard");
-      const data = await res.json();
+      if (!res.ok) return;
+      const data: LeaderboardUser[] = await res.json();
       setUsers(Array.isArray(data) ? data : []);
     };
     fetchLeaderboard();
@@ -26,11 +35,11 @@ export default function LeaderboardPage() {
             {user.image && (
               <img
                 src={user.image}
-                alt={user.name}
+                alt={user.name ?? "User"}
                 className="w-10 h-10 rounded-full"
               />
             )}
-            <span>{user.name || "Anonymous"}</span>
+            <span>{user.name ?? "Anonymous"}</span>
           </div>
           <span className="font-semibold">{user.points} pts</span>
         </div>
