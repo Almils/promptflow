@@ -35,9 +35,13 @@ export default function CommunityPage() {
     try {
       const res = await fetch("/api/community");
       if (!res.ok) throw new Error("Failed to fetch posts");
-      const data: Post[] = await res.json();
-      setPosts(Array.isArray(data) ? data : []);
-    } catch (err) {
+      const data: unknown = await res.json();
+      if (Array.isArray(data)) {
+        setPosts(data as Post[]);
+      } else {
+        throw new Error("Invalid data format");
+      }
+    } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
     } finally {
       setLoading(false);
@@ -62,7 +66,7 @@ export default function CommunityPage() {
       setPosts((prev) => [newPost, ...prev]);
       setTitle("");
       setContent("");
-    } catch (err) {
+    } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
     }
   };
@@ -77,7 +81,7 @@ export default function CommunityPage() {
       if (!res.ok) throw new Error("Failed to upvote");
       const updatedPost: Post = await res.json();
       setPosts((prev) => prev.map((p) => (p.id === updatedPost.id ? updatedPost : p)));
-    } catch (err) {
+    } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
     }
   };
@@ -93,7 +97,7 @@ export default function CommunityPage() {
       const updatedPost: Post = await res.json();
       setPosts((prev) => prev.map((p) => (p.id === updatedPost.id ? updatedPost : p)));
       setCommentContent((prev) => ({ ...prev, [postId]: "" }));
-    } catch (err) {
+    } catch (err: unknown) {
       if (err instanceof Error) setError(err.message);
     }
   };

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 interface LeaderboardUser {
   id: string;
@@ -16,8 +17,8 @@ export default function LeaderboardPage() {
     const fetchLeaderboard = async () => {
       const res = await fetch("/api/leaderboard");
       if (!res.ok) return;
-      const data: LeaderboardUser[] = await res.json();
-      setUsers(Array.isArray(data) ? data : []);
+      const data: unknown = await res.json();
+      if (Array.isArray(data)) setUsers(data as LeaderboardUser[]);
     };
     fetchLeaderboard();
   }, []);
@@ -33,10 +34,12 @@ export default function LeaderboardPage() {
           <div className="flex items-center space-x-3">
             <span className="text-xl font-bold">#{index + 1}</span>
             {user.image && (
-              <img
+              <Image
                 src={user.image}
                 alt={user.name ?? "User"}
-                className="w-10 h-10 rounded-full"
+                width={40}
+                height={40}
+                className="rounded-full"
               />
             )}
             <span>{user.name ?? "Anonymous"}</span>
